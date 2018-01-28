@@ -1,0 +1,523 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" />
+    <link href="~/Content/themes/base/jquery-ui.min.css" rel="stylesheet" />
+    <style>
+        span.field-validation-error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div style="width:90%; margin:0 auto" class="tablecontainer">
+        <a class="popup btn btn-primary" id="createData" style="margin-bottom:20px; margin-top:20px;">Add New Employee</a>
+        <table id="myDatatable">
+            <thead>
+                <tr>
+                    @*<th>EmployeeID</th>>*@
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email ID</th>
+                    <th>City</th>
+                    <th>Country</th>
+                    @*<th>Edit</th>*@
+                    @*<th>Delete</th>*@
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    @*Modal Edit Form*@
+    <div id="editDataModal" class="modal fade" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    @model CRUDMVCAPI.Models.DataModels.Employee
+                    @using (Html.BeginForm("save", "home", FormMethod.Post, new { id = "popupForm" }))
+                    {
+                        @*if (Model != null && Model.EmployeeID > 0)
+                        {
+                            @Html.HiddenFor(a => a.EmployeeID)
+                        }*@
+                        <div class="form-group" id="employeeIDlabel">
+                            <label>EmployeeID</label>
+                            @Html.TextBoxFor(a => a.EmployeeID, new { @class = "form-control", @readonly = "readonly" , id="employeeID" })
+                            @Html.ValidationMessageFor(a => a.EmployeeID)
+                        </div>
+                        <div class="form-group">
+                            <label>First Name</label>
+                            @Html.TextBoxFor(a => a.FirstName, new { @class = "form-control", id="firstName" , @readonly = "readonly" })
+                            @Html.ValidationMessageFor(a => a.FirstName)
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            @Html.TextBoxFor(a => a.LastName, new { @class = "form-control", id = "lastName" , @readonly = "readonly" })
+                            @Html.ValidationMessageFor(a => a.LastName)
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            @Html.TextBoxFor(a => a.EmailID, new { @class = "form-control", id = "emailID" , @readonly = "readonly" })
+                            @Html.ValidationMessageFor(a => a.EmailID)
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            @Html.TextBoxFor(a => a.City, new { @class = "form-control", id = "city" , @readonly = "readonly" })
+                            @Html.ValidationMessageFor(a => a.City)
+                        </div>
+                        <div class="form-group">
+                            <label>Country</label>
+                            @Html.TextBoxFor(a => a.Country, new { @class = "form-control", id = "country" , @readonly = "readonly" })
+                            @Html.ValidationMessageFor(a => a.Country)
+                        </div>
+                    }
+                </div>
+                    <div class="modal-footer">
+                        <button type="button" id="closeModalButton" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button id="edit-tag-form-submit" type="button" class="btn btn-primary" >Edit</button>
+                        <input id="save-tag-form-submit" type="submit" class="btn btn-primary" data-dismiss="modal" value="Save">
+                        <input id="create-tag-form-submit" type="submit" class="btn btn-primary" data-dismiss="modal" value="Create">
+                        <button id="delete-tag-form-submit" type="button" class="btn btn-primary" >Delete</button>
+                        <input id="confirm-delete-tag-form-submit" type="submit" class="btn btn-primary" data-dismiss="modal" value="Confirm">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+            @*Script Jquery,Boostrap,Datatables*@
+            <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+            <script src="~/Scripts/jquery.validate.min.js"></script>
+            <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+            <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+            <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+            <script>
+                var haveDataTable = 0;
+                var oTable;
+                $(document).ready(function () {
+                    //Generate Table
+                    haveDataTable = 1;
+                    oTable = $('#myDatatable').DataTable({
+                        "ajax": {
+                            "url": '/api/data/get/',
+                            "type": "get",
+                            "datatype": "json"
+                        },
+                        "columns": [
+                            { "data": "FirstName", "autoWidth": true },
+                            { "data": "LastName", "autoWidth": true },
+                            { "data": "EmailID", "autoWidth": true },
+                            { "data": "City", "autoWidth": true },
+                            { "data": "Country", "autoWidth": true }
+                            //{
+                            //    "data": "EmployeeID", "width": "50px", "render": function (data) {
+                            //        return '<a class="popup" href="/home/save/' + data + '">Edit</a>';
+                            //    }
+                            //},
+                            //{
+                            //    "data": "EmployeeID", "width": "50px", "searchable": false, "targets": 0, "render": function (data) {
+                            //        return '<a class="popup" href="/home/delete/' + data + '">Delete</a>';
+                            //    }
+                            //}
+                        ]
+                    });
+
+                    //$('.tablecontainer').on('click', 'a.popup', function (e) {
+                    //    e.preventDefault();
+                    //    OpenPopup($(this).attr('href'));
+                    //});
+
+                    //function OpenPopup(pageUrl) {
+                    //    var $pageContent = $('<div/>');
+                    //    $pageContent.load(pageUrl, function () {
+                    //        $('#popupForm', $pageContent).removeData('validator');
+                    //        $('#popupForm', $pageContent).removeData('unobtrusiveValidation');
+                    //        $.validator.unobtrusive.parse('form');
+
+                    //    });
+
+                    //    $dialog = $('<div class="popupWindow" style="overflow:auto"></div>')
+                    //        .html($pageContent)
+                    //        .dialog({
+                    //            draggable: false,
+                    //            autoOpen: false,
+                    //            resizable: false,
+                    //            model: true,
+                    //            title: 'Popup Dialog',
+                    //            height: 550,
+                    //            width: 600,
+                    //            close: function () {
+                    //                $dialog.dialog('destroy').remove();
+                    //            }
+                    //        });
+
+                    //    $('.popupWindow').on('submit', '#popupForm', function (e) {
+                    //        var url = $('#popupForm')[0].action;
+                    //        $.ajax({
+                    //            type: "POST",
+                    //            url: url,
+                    //            data: $('#popupForm').serialize(),
+                    //            success: function (data) {
+                    //                if (data.status) {
+                    //                    $dialog.dialog('close');
+                    //                    oTable.ajax.reload();
+                    //                }
+                    //            }
+                    //        });
+
+                    //        e.preventDefault();
+                    //    });
+
+                    //    $dialog.dialog('open');
+                    //}
+
+                    //Create New data
+                    $('#createData').on('click', function () {
+                        //OpenPopup('/home/save/' + data.EmployeeID);
+                        $('#employeeIDlabel').hide();
+                        $('#myModalLabel').text("Create Data");
+                        checkModalType();
+                        $('#edit-tag-form-submit').hide();
+                        $('#create-tag-form-submit').show();
+                        $('#delete-tag-form-submit').hide();
+                        $('#save-tag-form-submit').hide();
+                        $('#confirm-delete-tag-form-submit').hide();
+                        $("#editDataModal").modal('show');
+                        
+                    });
+
+                    //When click create button in modal
+
+                    $("#create-tag-form-submit").click(function () {
+                        //e.preventDefault();
+
+                        $("#editDataModal").modal('show');
+                        var erroralert = "";
+                        $.ajax({
+                            type: "POST",
+                            url: '/api/data/post/',
+                            data: JSON.stringify({
+                                FirstName: $("#firstName").val(),
+                                LastName: $("#lastName").val(),
+                                EmailID: $("#emailID").val(),
+                                City: $("#city").val(),
+                                Country: $("#country").val(),
+                            }),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (response) {
+                                for (i = 0; i < response.length; i++) {
+                                    erroralert += response[i] + "\n"
+                                }
+                                if (erroralert !== "") {
+                                    alert(erroralert + "");
+
+                                } else {
+                                    alert("Create Success");
+                                    $('#editDataModal').modal('hide');
+                                    CreateDataTable();
+
+                                }
+                            },
+                            failure: function (response) {
+                                console.log(response + "Failure");
+                            },
+                            error: function (response) {
+                                console.log(response + "Error");
+                            }
+                        });
+
+                    });
+
+
+                    // Select Data in DataTable
+
+                    $('#myDatatable tbody').on('click', 'tr', function () {
+                        var dataRow = oTable.row(this).data();
+                        oTable.$('tr.selected').removeClass('selected');
+                        $(this).addClass('selected');
+                        //OpenPopup('/home/save/' + data.EmployeeID);
+                        $('#myModalLabel').text("Details");
+                        checkModalType();
+                        $('#edit-tag-form-submit').show();
+                        $('#delete-tag-form-submit').show();
+                        $('#save-tag-form-submit').hide();
+                        $('#create-tag-form-submit').hide();
+                        $("#editDataModal").modal('show');
+                        $('#editDataModal').modal({ 'backdrop': 'static' });
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/data/get/" + dataRow.EmployeeID,
+                            dataType: "json",
+                            data: { EmployeeID: dataRow.EmployeeID },
+                            success: function (response) {
+                                $('#employeeID').val(response.data.EmployeeID);
+                                $('#firstName').val(response.data.FirstName);
+                                $('#lastName').val(response.data.LastName);
+                                $('#emailID').val(response.data.EmailID);
+                                $('#city').val(response.data.City);
+                                $('#country').val(response.data.Country);
+
+                                //End of foreach Loop
+                                console.log(response);
+                            }, //End of AJAX Success function
+
+                            failure: function (data) {
+                                //alert("Failure auto fill data");
+                                console.log(response.data);
+                            }, //End of AJAX failure function
+                            error: function (data) {
+                                //alert("Error auto fill data");
+                                console.log(response.data);
+                            } //End of AJAX error function
+                        });
+                    });
+
+                    //Click Edit button to edit data
+                    $('#edit-tag-form-submit').click(function () {
+                        $('#myModalLabel').text("Edit Data");
+                        $('#edit-tag-form-submit').hide();
+                        $('#create-tag-form-submit').hide();
+                        $('#delete-tag-form-submit').hide();
+                        $('#save-tag-form-submit').show();
+                        $('#confirm-delete-tag-form-submit').hide();
+                        checkModalType();
+
+                    });
+
+                    //Edit Data from Modal to Database
+
+                    $("#save-tag-form-submit").click(function () {
+                        //e.preventDefault();
+                        console.log($('#employeeID').val());
+                        var erroralert = "";
+                        $.ajax({
+                            type: "PUT",
+                            url: '/api/data/put/' + $('#employeeID').val(),
+                            data: JSON.stringify({
+                                EmployeeID: $("#employeeID").val(),
+                                FirstName: $("#firstName").val(),
+                                LastName: $("#lastName").val(),
+                                EmailID: $("#emailID").val(),
+                                City: $("#city").val(),
+                                Country: $("#country").val(),
+                            }),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (response) {
+                                for (i = 0; i < response.length; i++) {
+                                    erroralert += response[i] + "\n"
+                                }
+                                if (erroralert !== "") {
+                                    alert(erroralert + "");
+
+                                } else {
+                                    alert("Update Success");
+                                    CreateDataTable();
+                                    $('#editDataModal').modal('hide');
+                                }
+                            },
+                            failure: function (response) {
+                                console.log(response + "Failure");
+                            },
+                            error: function (response) {
+                                console.log(response + "Error");
+                            }
+                        });
+
+                    });
+
+                    //When click delete button to show confirm delete message
+                    $('#delete-tag-form-submit').click(function () {
+                        $('#edit-tag-form-submit').hide();
+                        $('#create-tag-form-submit').hide();
+                        $('#delete-tag-form-submit').hide();
+                        $('#save-tag-form-submit').hide();
+                        $('#confirm-delete-tag-form-submit').show();
+                        console.log($('#employeeID').val());
+                        $('#myModalLabel').text("Are you sure to DELETE this data?");
+                        checkModalType();
+                        $('#deleteDataModal').modal('show');
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/data/get/" + $('#employeeID').val(),
+                            dataType: "json",
+                            data: { EmployeeID: $('#employeeID').val() },
+                            success: function (response) {
+                                $('#employeeID').val(response.data.EmployeeID);
+                                $('#firstName').val(response.data.FirstName);
+                                $('#lastName').val(response.data.LastName);
+                                $('#emailID').val(response.data.EmailID);
+                                $('#city').val(response.data.City);
+                                $('#country').val(response.data.Country);
+
+                                //End of foreach Loop
+                                console.log(response);
+                            }, //End of AJAX Success function
+
+                            failure: function (data) {
+                                //alert("Failure auto fill data");
+                                console.log(response.data);
+                            }, //End of AJAX failure function
+                            error: function (data) {
+                                //alert("Error auto fill data");
+                                console.log(response.data);
+                            } //End of AJAX error function
+                        });
+                    });
+
+                    //Click Confirm delete button
+                    $('#confirm-delete-tag-form-submit').click(function () {
+                        erroralert = "";
+                        $.ajax({
+                            type: "DELETE",
+                            url: '/api/data/delete/' + $('#employeeID').val(),
+                            data: JSON.stringify({
+                                EmployeeID: $("#employeeID").val(),
+                                FirstName: $("#firstName").val(),
+                                LastName: $("#lastName").val(),
+                                EmailID: $("#emailID").val(),
+                                City: $("#city").val(),
+                                Country: $("#country").val(),
+                            }),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (response) {
+                                for (i = 0; i < response.length; i++) {
+                                    erroralert += response[i] + "\n"
+                                }
+                                if (erroralert !== "") {
+                                    alert(erroralert + "");
+
+                                } else {
+                                    alert("Delete Success");
+                                    $('#editDataModal').modal('hide');
+                                    CreateDataTable();
+
+                                }
+                            },
+                            failure: function (response) {
+                                console.log(response + "Failure");
+                            },
+                            error: function (response) {
+                                console.log(response + "Error");
+                            }
+                        });
+                    });
+
+                    //Multilayer Modal Script
+
+                    $('.modal').on('hidden.bs.modal', function (event) {
+                        $(this).removeClass('fv-modal-stack');
+                        $('body').data('fv_open_modals', $('body').data('fv_open_modals') - 1);
+                    });
+
+                    $('.modal').on('shown.bs.modal', function (event) {
+                        // keep track of the number of open modals
+                        if (typeof ($('body').data('fv_open_modals')) == 'undefined') {
+                            $('body').data('fv_open_modals', 0);
+                        }
+
+                        // if the z-index of this modal has been set, ignore.
+                        if ($(this).hasClass('fv-modal-stack')) {
+                            return;
+                        }
+
+                        $(this).addClass('fv-modal-stack');
+                        $('body').data('fv_open_modals', $('body').data('fv_open_modals') + 1);
+                        $(this).css('z-index', 1040 + (10 * $('body').data('fv_open_modals')));
+                        $('.modal-backdrop').not('.fv-modal-stack').css('z-index', 1039 + (10 * $('body').data('fv_open_modals')));
+                        $('.modal-backdrop').not('fv-modal-stack').addClass('fv-modal-stack');
+
+                    });
+
+                });
+
+                function CreateDataTable() {
+                    //Check table if already have data
+                    if (haveDataTable != 0) {
+                        oTable.destroy();
+                    }
+                    //Generate Table
+                    haveDataTable = 1;
+                    oTable = $('#myDatatable').DataTable({
+                        "ajax": {
+                            "url": '/api/data/get/',
+                            "type": "get",
+                            "datatype": "json"
+                        },
+                        "columns": [
+                            { "data": "FirstName", "autoWidth": true },
+                            { "data": "LastName", "autoWidth": true },
+                            { "data": "EmailID", "autoWidth": true },
+                            { "data": "City", "autoWidth": true },
+                            { "data": "Country", "autoWidth": true },
+                            //{
+                            //    "data": "EmployeeID", "width": "50px", "render": function (data) {
+                            //        return '<a class="popup" href="/home/save/' + data + '">Edit</a>';
+                            //    }
+                            //},
+                            //{
+                            //    "data": "EmployeeID", "width": "50px", "searchable": false, "targets": 0, "render": function (data) {
+                            //        return '<a class="popup" href="/home/delete/' + data + '">Delete</a>';
+                            //    }
+                            //}
+                        ]
+                    });
+                }
+
+                function clearInput() {
+                    $('#firstName').val("");
+                    $('#lastName').val("");
+                    $('#emailID').val("");
+                    $('#city').val("");
+                    $('#country').val("");
+                    console.log("Data Input Cleared!");
+                }
+
+                function enableInput() {
+                    $('#firstName').attr('readonly', false);
+                    $('#lastName').attr('readonly', false);
+                    $('#emailID').attr('readonly', false);
+                    $('#city').attr('readonly', false);
+                    $('#country').attr('readonly', false);
+                    console.log("Data Input Enabled!");
+                }
+                
+                function disableInput() {
+                    $('#firstName').attr('readonly', true);
+                    $('#lastName').attr('readonly', true);
+                    $('#emailID').attr('readonly', true);
+                    $('#city').attr('readonly', true);
+                    $('#country').attr('readonly', true);
+                    console.log("Data Input Disabled!");
+                }
+
+                function checkModalType() {
+                    if ($('#myModalLabel').html() == "Edit Data" || $('#myModalLabel').html() == "Create Data") {
+                        enableInput();
+                        if ($('#myModalLabel').html() == "Create Data") { clearInput(); }
+                    }
+                    else {
+                        disableInput();
+                    }
+                }
+
+            </script>
+</body>
+</html>

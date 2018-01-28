@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRUDMVCAPI", "CRUDMVCAPI\CRUDMVCAPI.csproj", "{B7750CF9-B886-48F1-90CF-E7D40125EE1B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B7750CF9-B886-48F1-90CF-E7D40125EE1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7750CF9-B886-48F1-90CF-E7D40125EE1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7750CF9-B886-48F1-90CF-E7D40125EE1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7750CF9-B886-48F1-90CF-E7D40125EE1B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8CB6546-0B6F-41BD-9314-A9FEB2024665}
+	EndGlobalSection
+EndGlobal
